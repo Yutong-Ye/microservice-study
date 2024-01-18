@@ -1,4 +1,4 @@
-events/keys.py
+monolith/events/keys.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
