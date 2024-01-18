@@ -1,5 +1,10 @@
-###Microservice study
+##Microservice study
 
+- part 1 Unmonolith Attendees: Set up the project 
+- part 2 Moving Stuff Around: Moving attendees into its own services, port 8001, attendees in attendees_bc needs to have access to conference VO instanct, updated conference data will be coming from the poller 
+- part 3 Syncing Data: poller and synchronize data from the monolith into the attendees microservice
+
+###1. Unmonolith Attendees
 
 ![GitHub Logo](/images/UnmonolithAttendees.png)
 
@@ -86,7 +91,7 @@ docker image prune --all
 
 
 
-###Moving the monolith
+###2. Moving the monolith
 
 Open a terminal
 Open a terminal to the directory that contains the project that you're working in. You're going to use the command line to move things around. It's just a series of commands, of mkdir (make directory) and mv (move) and cp (copy).
@@ -359,7 +364,7 @@ Stop the container because you're going to need to rebuild the image.
 
 
 
-###Syncing Data
+###3. Syncing Data
 
 Now we're going to synchronize data from the monolith into the attendees microservice.
 
@@ -373,6 +378,9 @@ django-crontab==0.7.1
 We don't have to do anything more with that because the next time we build the image for the attendees microservice, Docker will install that into the image!
 
 Check out the package's documentation  on PyPi.
+
+
+![GitHub Logo](/images/poller.png)
 
 Write the sync script
 Create a new file, attendees_microservice/attendees/poll.py. Put the following into that file. If you copy and paste, make sure you understand what it's doing.
@@ -456,17 +464,18 @@ Test it all out
 Start the two
 Start the two containers with their names and networks.
 
-This one starts the monolith:
+This one starts the monolith: (run in the top leverl directory)
 
 ```python
 docker run -d -v "$(pwd)/monolith:/app" -p "8000:8000" --network conference-go --name monolith conference-go-dev
 ```
-This one starts the microservice:
+This one starts the microservice: (run in the top leverl directory)
 ```python
 docker run -d -v "$(pwd)/attendees_microservice:/app" -p "8001:8001" --network conference-go --name attendees-microservice attendees-microservice-dev
 ```
 To make sure the polling is happening, run the following command to watch the logs of the monolith. It'll take at most one minute for something to appear.
 
+- (run in the top leverl directory)
 ```python
 docker container logs --follow monolith
 ```
@@ -474,6 +483,7 @@ Type Control+C to exit out of that.
 
 If no logs appear, look at the logs for the microservice.
 
+- (run in the top leverl directory)
 ```python 
 docker container logs --follow attendees-microservice
 ```
@@ -483,4 +493,3 @@ Clean up
 docker container stop attendees-microservice monolith
 docker container rm attendees-microservice monolith
 ```
-![GitHub Logo](/images/poller.png)
